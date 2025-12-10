@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import DataTable from "../components/DataTable";
 
-interface Event {
+interface EventRow {
   id: number;
   event_time: string;
   event_type: string;
@@ -9,41 +10,34 @@ interface Event {
 }
 
 export default function EventsList() {
-  const [events, setEvents] = useState<Event[]>([]);
-
-  const load = async () => {
-    const res = await api.get<Event[]>("/events?limit=50");
-    setEvents(res.data);
-  };
+  const [rows, setRows] = useState<EventRow[]>([]);
 
   useEffect(() => {
-    load();
+    api.get("/events?limit=50").then((res) => setRows(res.data));
   }, []);
 
-  return (
-    <div className="container mt-5">
-      <h3>Events</h3>
+  const columns = [
+    { key: "id", label: "ID" },
+    { key: "task_id", label: "Task Id" },
+    { key: "event_time", label: "Event Time" },
+    { key: "event_type", label: "Event Type" },
+    { key: "page_url", label: "Page URL" },
+    { key: "target_selector", label: "target_selector" },
+    { key: "locators_json", label: "locators_json" },
+    { key: "data_testid", label: "data_testid" },
+    { key: "element_tag", label: "element_tag" },
+    { key: "selector_xpath", label: "selector_xpath" },
+    { key: "interaction_type", label: "interaction_type" },
+    { key: "input_data", label: "input_data" },
+    { key: "api_path", label: "api_path" },
+    { key: "api_method", label: "api_method" },
+    { key: "api_status_code", label: "api_status_code" }
+  ];
 
-      <table className="table table-bordered mt-3">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>event_time</th>
-            <th>event_type</th>
-            <th>page_url</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map((ev) => (
-            <tr key={ev.id}>
-              <td>{ev.id}</td>
-              <td>{ev.event_time}</td>
-              <td>{ev.event_type}</td>
-              <td>{ev.page_url?.slice(0, 60)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  return (
+    <div className="container mt-4">
+      <h3>Events</h3>
+      <DataTable columns={columns} data={rows} />
     </div>
   );
 }

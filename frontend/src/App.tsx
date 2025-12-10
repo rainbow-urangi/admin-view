@@ -4,10 +4,18 @@ import Dashboard from "./pages/Dashboard";
 import EventsList from "./pages/EventsList";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CreateSimpleUser from "./pages/CreateSimpleUser";
+import Navbar from "./components/Navbar";
+import AZEventsList from "./pages/AZEventsList";
+import SessionsList from "./pages/SessionsList";
+import TasksList from "./pages/TasksList";
+import SnapshotsList from "./pages/SnapshotsList";
 
 function App() {
   return (
     <BrowserRouter>
+      
+      <Navbar />
+      
       <Routes>
         {/* 로그인 */}
         <Route path="/" element={<LoginPage />} />
@@ -39,6 +47,11 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route path="/az-events" element={<ProtectedRoute><AZEventsList/></ProtectedRoute>} />
+        <Route path="/sessions" element={<ProtectedRoute><SessionsList/></ProtectedRoute>} />
+        <Route path="/tasks" element={<ProtectedRoute><TasksList/></ProtectedRoute>} />
+        <Route path="/snapshots" element={<ProtectedRoute><SnapshotsList/></ProtectedRoute>} />
       </Routes>
 
     </BrowserRouter>
