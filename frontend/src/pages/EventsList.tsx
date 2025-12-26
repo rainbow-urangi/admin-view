@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import DataTable from "../components/DataTable";
+import Pagination from "../components/Pagination";
+import { useNavigate } from "react-router-dom";
 
 interface EventRow {
   id: number;
+  task_id: number;
   event_time: string;
   event_type: string;
   page_url: string;
@@ -11,9 +14,20 @@ interface EventRow {
 
 export default function EventsList() {
   const [rows, setRows] = useState<EventRow[]>([]);
+  const [page, setPage] = useState(1);
+  const limit = 50;
+  const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
+
+  const load = async (pageNum = 1) => {
+    const res = await api.get(`/events?page=${pageNum}&limit=${limit}`);
+    setRows(res.data.rows);
+    setTotal(res.data.total);
+    setPage(res.data.page);
+  };
 
   useEffect(() => {
-    api.get("/events?limit=50").then((res) => setRows(res.data));
+    load(1);
   }, []);
 
   const columns = [
@@ -22,22 +36,26 @@ export default function EventsList() {
     { key: "event_time", label: "Event Time" },
     { key: "event_type", label: "Event Type" },
     { key: "page_url", label: "Page URL" },
-    { key: "target_selector", label: "target_selector" },
-    { key: "locators_json", label: "locators_json" },
-    { key: "data_testid", label: "data_testid" },
-    { key: "element_tag", label: "element_tag" },
-    { key: "selector_xpath", label: "selector_xpath" },
-    { key: "interaction_type", label: "interaction_type" },
-    { key: "input_data", label: "input_data" },
-    { key: "api_path", label: "api_path" },
     { key: "api_method", label: "api_method" },
     { key: "api_status_code", label: "api_status_code" }
   ];
 
+  const onRowClick = (row: EventRow) => {
+    navigate(`/events/${row.id}`);
+  };
+
   return (
     <div className="container mt-4">
       <h3>Events</h3>
-      <DataTable columns={columns} data={rows} />
+
+      <DataTable columns={columns} data={rows} onRowClick={onRowClick} />
+
+      <Pagination
+        page={page}
+        limit={limit}
+        total={total}
+        onPageChange={load}
+      />
     </div>
   );
 }

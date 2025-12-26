@@ -28,12 +28,25 @@ router.get("/", authRequired, async (req, res) => {
     params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
   }
 
+  // ⭐ total count 조회
+  const totalQuery = await pool.query(
+    `SELECT COUNT(*) AS total FROM events ${where}`,
+    params
+  );
+  const total = totalQuery[0][0].total;
+
+  // ⭐ 실제 페이지 데이터 조회
   const [rows] = await pool.query(
     `SELECT * FROM events ${where} ORDER BY event_time DESC LIMIT ? OFFSET ?`,
     [...params, Number(limit), Number(offset)]
   );
 
-  res.json(rows);
+  res.json({
+    rows,
+    total,
+    page: Number(page),
+    limit: Number(limit)
+  });
 });
 
 /* -------------------- 개별 event 조회 -------------------- */

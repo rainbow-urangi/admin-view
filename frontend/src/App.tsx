@@ -9,10 +9,17 @@ import AZEventsList from "./pages/AZEventsList";
 import SessionsList from "./pages/SessionsList";
 import TasksList from "./pages/TasksList";
 import SnapshotsList from "./pages/SnapshotsList";
+import AZEventDetail from "./pages/AZEventDetail";
+import EventDetail from "./pages/EventDetail";
+import SessionDetail from "./pages/SessionDetail";
+import TaskDetail from "./pages/TaskDetail";
+import SnapshotDetail from "./pages/SnapshotDetail";
+import UserManagement from "./pages/UserManagement";
+
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/admin">
       
       <Navbar />
       
@@ -52,6 +59,13 @@ function App() {
         <Route path="/sessions" element={<ProtectedRoute><SessionsList/></ProtectedRoute>} />
         <Route path="/tasks" element={<ProtectedRoute><TasksList/></ProtectedRoute>} />
         <Route path="/snapshots" element={<ProtectedRoute><SnapshotsList/></ProtectedRoute>} />
+        <Route path="/az-events/:id" element={<ProtectedRoute> <AZEventDetail /></ProtectedRoute>}/>
+        <Route path="/events/:id" element={<ProtectedRoute> <EventDetail /> </ProtectedRoute>}/>  
+        <Route path="/sessions/:id" element={<ProtectedRoute><SessionDetail /></ProtectedRoute>}/>  
+        <Route path="/tasks/:id" element={<ProtectedRoute><TaskDetail /></ProtectedRoute>}/>
+        <Route path="/snapshots/:event_id" element={<ProtectedRoute><SnapshotDetail /></ProtectedRoute>}/>  
+        <Route path="/user-management" element={<ProtectedRoute><UserManagement /></ProtectedRoute>}/>  
+
       </Routes>
 
     </BrowserRouter>

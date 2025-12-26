@@ -4,16 +4,42 @@ import { authRequired } from "../middlewares/auth.js";
 
 const router = express.Router();
 
+// 📌 목록 조회 (pagination)
 router.get("/", authRequired, async (req, res) => {
   const { limit = 50, page = 1 } = req.query;
   const offset = (page - 1) * limit;
+
+  const [[{ total }]] = await pool.query(
+    `SELECT COUNT(*) AS total FROM sessions`
+  );
 
   const [rows] = await pool.query(
     `SELECT * FROM sessions ORDER BY start_time DESC LIMIT ? OFFSET ?`,
     [Number(limit), Number(offset)]
   );
 
-  res.json(rows);
+  res.json({
+    rows,
+    total,
+    page: Number(page),
+    limit: Number(limit)
+  });
+});
+
+// ⭐ 상세 조회
+router.get("/:id", authRequired, async (req, res) => {
+  const { id } = req.params;
+
+  const [rows] = await pool.query(
+    `SELECT * FROM sessions WHERE id = ?`,
+    [id]
+  );
+
+  if (!rows.length) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  res.json(rows[0]);
 });
 
 export default router;

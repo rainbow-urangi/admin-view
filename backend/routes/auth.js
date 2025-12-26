@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import pool from "../config/db.js";
 import { mailer } from "../config/mail.js";
 import crypto from "crypto";
+import { authRequired } from "../middlewares/auth.js";
 
 
 const router = express.Router();
@@ -100,6 +101,35 @@ router.post("/create-simple-user", async (req, res) => {
       success: true,
       email,
       generatedPassword
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ error: "Failed to create account" });
+  }
+});
+
+// 화면에서 관리자 생성
+router.post("/create-user", authRequired, async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return res.status(400).json({ error: "email and password are required" });
+
+  const hash = await bcrypt.hash(password, 10);
+
+  try {
+    await pool.query(
+      `INSERT INTO admin_users (email, password_hash, role)
+       VALUES (?, ?, 'ADMIN')
+       ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash)`,
+      [email, hash]
+    );
+
+    return res.json({
+      success: true,
+      email,
+      password,
     });
 
   } catch (err) {

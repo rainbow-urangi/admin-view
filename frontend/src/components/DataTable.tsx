@@ -6,14 +6,15 @@ interface Column {
 interface Props {
   columns: Column[];
   data: any[];
+  onRowClick?: (row: any) => void;
 }
 
-export default function DataTable({ columns, data }: Props) {
+export default function DataTable({ columns, data, onRowClick }: Props) {
   return (
-    <table className="table table-bordered mt-3">
+    <table className="table table-hover table-bordered mt-3">
       <thead>
         <tr>
-          {columns.map((col) => (
+          {columns.map(col => (
             <th key={col.key}>{col.label}</th>
           ))}
         </tr>
@@ -21,9 +22,13 @@ export default function DataTable({ columns, data }: Props) {
 
       <tbody>
         {data.map((row, idx) => (
-          <tr key={idx}>
-            {columns.map((col) => (
-              <td key={col.key}>{String(row[col.key]).slice(0, 80)}</td>
+          <tr
+            key={idx}
+            onClick={() => onRowClick?.(row)}
+            style={{ cursor: onRowClick ? "pointer" : "default" }}
+          >
+            {columns.map(col => (
+              <td key={col.key}>{String(row[col.key] ?? "").slice(0, 120)}</td>
             ))}
           </tr>
         ))}
